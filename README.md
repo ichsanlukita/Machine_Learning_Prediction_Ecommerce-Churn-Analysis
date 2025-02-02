@@ -1,103 +1,124 @@
-# Caspstone-3---Muhammad-Ichsan-Lukita---Ecommerce-Churn-Analysis
+# **E-commerce Customer Churn Analysis**
+**by: Muhammad Ichsan Lukita**
 
+## **1. Background**
+E-commerce businesses need to continuously adapt their strategies to reduce **customer churn**, which directly impacts revenue. Retaining existing customers is more cost-effective than acquiring new ones.
 
-# E-commerce Customer Churn
-by: Muhammad Ichsan Lukita
+To tackle this issue, **Machine Learning (ML) is used** to predict which customers are likely to churn. This allows businesses to allocate promotional resources effectively, minimizing unnecessary expenses while maximizing customer retention.
 
+## **2. Business Problem**
+### **Problem Statement**
+- What factors contribute to customer churn?
+- How can businesses use predictive analytics to reduce churn and retain customers?
+
+### **Business Goals (Measurable)**
+- Reduce **churn rate from 20% to 15% within 6 months**.
+- Optimize marketing expenses by **targeting promotions only to at-risk customers**.
+- Reduce **unnecessary promotional spending by at least 50%**.
+
+### **Implementation Plan**
+- **Who will use the model?** Marketing and customer retention teams.
+- **When is the model used?** Every **end of the month** to identify potential churners.
+- **How is it implemented?** The model outputs a **list of high-risk customers**, who will receive targeted promotions to retain them.
 
 ---
-# Backgrounds:
-An E-commerce aims to adjust the strategy for customer churn that occurs. Analysis is needed to identify the most likely customer tendencies to leave the service within the platform.
 
-In order to preserve revenue health within the organization besides getting customers retaining existing customers from churning is very important for the company.
-<br><br>
-Therefore an analytical approach with Machine Learning is considered as the suitable forecasting approaches in presenting insights to find pattern based on predictions and recommendations on the business strategy
+## **3. Data Understanding**
+### **Dataset Description**
+The dataset includes customer transactional data with the following key features:
+- **Tenure** (length of customer relationship)
+- **WarehouseToHome** (distance from warehouse to home)
+- **NumberOfDeviceRegistered** (number of registered devices)
+- **PreferedOrderCat** (preferred order category)
+- **SatisfactionScore** (customer satisfaction score)
+- **MaritalStatus** (marital status)
+- **NumberOfAddress** (number of registered addresses)
+- **Complain** (customer complaint history)
+- **DaySinceLastOrder** (days since last purchase)
+- **CashbackAmount** (total cashback received)
+- **Churn** (target variable: whether the customer churned or not)
 
+### **Data Summary**
+- **Total records:** 3941
+- **Churned Customers:** 107
+- **Loyal Customers:** 546
+- **Missing Values:** Present in `Tenure`, `WarehouseToHome`, and `DaySinceLastOrder`.
+- **Handling Missing Values:** Used **IterativeImputer** and **SimpleImputer**.
+- **Duplicate Data:** **672 duplicate rows (17.05%)** were removed.
 
 ---
-# Problem Statement:
-- What factors can influence customer churn?
-- What business strategies can companies implement to reduce churn rates and retain customers?
 
+## **4. Machine Learning Approach**
+### **Chosen Model: Tuned XGBoost Classifier**
+- **Selected as the final model** due to superior Recall performance.
+- Compared against **Logistic Regression, Random Forest, Gradient Boosting, AdaBoost, and SVM**.
+- **Hyperparameter tuning** was performed using GridSearchCV to improve recall.
+
+### **Evaluation Metrics Selection**
+We prioritize **Recall over Precision** because:
+- **False Negatives (FN) are more costly than False Positives (FP).**
+- Losing a customer costs **$500**, while a wasted promotion costs only **$100**.
+- Using **F-beta score (β = 2)** ensures **Recall is given more weight**.
+
+#### **Final Model Performance (Tuned XGBoost)**
+| Metric       | Value |
+|-------------|-------|
+| **Precision (Churner)** | 0.67 |
+| **Recall (Churner)** | 0.86 |
+| **F1-Score (Churner)** | 0.75 |
+| **Accuracy** | 91% |
+| **Macro Avg Recall** | 0.89 |
+| **Weighted Avg Recall** | 0.91 |
+
+📌 **Key Takeaway:** Prioritizing Recall helps capture more churned customers, reducing customer loss despite a small drop in Precision.
 
 ---
-# Objective:
-- Finding potential dependent factors on customer churn
-- Provide measurable predictive results as recommendations for strategic steps,
-in order to provide promotions that are right on target to maintain customer loyalty
 
-----
-# Conclusion:
+## **5. Handling Imbalanced Data**
+### **Why Use Both `class_weight='balanced'` and SMOTE?**
+- **SMOTE (Synthetic Minority Over-sampling Technique)** generates synthetic samples of churners to balance the dataset.
+- **Class weight balancing** ensures the model does not favor the majority class (non-churners).
+- **Both were used together** to improve recall while minimizing overfitting.
 
- - FP:
-we predict the customer will churn (action --> we give a promotion at a cost of $100), even though it actually doesn't churn
-- FN:
-we predict that the customer will not churn (action --> we don't pay attention to this customer), even though it actually churns (losing a customer at a cost of $500)
+---
 
+## **6. Model Interpretation: SHAP Analysis**
+Using **SHAP (SHapley Additive Explanations)**, we identified the most important factors influencing churn:
+1. **DaysSinceLastOrder** → Customers inactive for 9+ months are more likely to churn.
+2. **Tenure** → New customers (<3 months) have higher churn rates.
+3. **Warehouse Distance** → Customers living **5-15 KM** from the warehouse have higher churn tendencies.
 
+📌 **Business Implication:** These factors should be the **main focus of retention strategies**.
 
+---
 
-- FP Cost:
-$150
--FN Cost:
-$675
+## **7. Results & Business Impact**
+### **Cost Comparison: Without vs. With ML**
+| Scenario  | Cost of False Actions | Total Cost |
+|-----------|----------------------|------------|
+| **Without ML** (Target all customers) | $81,900 | $97,950 |
+| **With ML** (Targeted promotions) | $17,020 | 🔽 **$17,020** (Reduction of **79.21%**) |
 
+**ML successfully reduced unnecessary expenses and minimized churn-related losses.**
 
-**Without using ML**
+---
 
- Before using ML, the company did not know which customers would be churned, so it had to pay for promotions to all customers. Companies do not want to take risks because the cost of losing customers is greater.
+## **8. Recommendations**
+### **For Business Strategy**
+✔ **Customers with <3 months tenure** → Offer cashback & discounts to increase engagement.
+✔ **Customers with 5-15 KM warehouse distance** → Provide free delivery incentives.
+✔ **Customers inactive for 9+ months** → Run re-engagement campaigns.
+✔ **Deploy ML model monthly** to continuously improve churn prediction accuracy.
 
- We assume that when a customer is given a promotion, that customer will not churn.
+---
 
- - Company expenses on promotion (TP+FP+TN+FN):
-$150 x 653 = $97,950
-- Targeted promotion at churn (TP+FN):
-$150 x 107 = $16,050
-- This means that the company spends promotional costs in vain on loyal customers:
-$ 97,950 - $ 16,050 = $ 81,900
+## **9. Conclusion**
+✅ **ML significantly reduces promotional waste and improves customer retention strategies.**
+✅ **F2 Score prioritizing Recall helped minimize costly False Negatives.**
+✅ **SHAP insights guide targeted retention efforts, improving decision-making.**
+✅ **Future improvements:** Further hyperparameter tuning & real-time integration with CRM.
 
- **By using ML**
+---
 
- After using ML, companies can predict which customers will churn, so that they can spend on promotions that are more targeted. - Business expenses for false advertising to loyal customers (FP):
-$150 x 46 = $6,900
-- Companies lose customers due to unpredictable churn (FN).
-$675 x 15 = $10,120
-- This means that the company has suffered a loss.
-$6,900 + $10,120 = $17,020
+🚀 **This project successfully demonstrates how Machine Learning can be leveraged to minimize churn and optimize marketing costs in e-commerce.** 🎯
 
- **Less reduction after using ML**
-
- - Loss before using ML:
-$81,900
-- Loss after using ML:
-$17,020
-- ML succeeded in reducing the company's loss by 79.21% --> ($81,900 - $17,020) / $81,900 
-
-
------
-# Recommendation
-  
-**Businesses**:
-
-- Customers with a Tenure period of less than 3 months have to be our concern how to retain them by giving promos in this case could be Cashback, Discount, etc.
-
-- Customers with the distance between Warehouse To Home categorized in the range 5 - 15 KM having the likelihood to be churn. Meaning we have to trigger them by using promotions such as free delivery
-
-
-- Customers who are 9 months from the last day of purchase in DaySinceLastOrder. It is necessary to give promotions to customers with these criteria to stimulate purchase activities, as a retention strategy
-
-- Implementing prediction analysis by developing Machine Learning in order to capture the churn pattern of a customer.
-
-
-
-**Machine Learning and Data**:
-
-- There are columns with other features that are directly related to the services that e-commerce companies provide and customer transactions, such as the average number of customer purchases, the number of product purchases per month, the duration of product delivery, and so on
-
-- A model can be improved by tuning hyperparameters with values already obtained as references or by adding additional parameters. 
-
-- There are columns with other features that are directly related to the services that e-commerce companies provide and customer transactions, such as the average number of customer purchases, the number of products purchased per month, the duration of product delivery, and so on. 
-
-- Raise the consumer data to produce predictions that are more accurate. 
-
-- The requirement to equate formats or commercial phrases to prevent meaning bias.
